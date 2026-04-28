@@ -21,12 +21,12 @@
 - [x] Create DOCUMENTATION.md for metrics module
 
 ## Module 4: Refiner Stages
-- [ ] Create refiner.py with four stages (A/B/C/M)
-- [ ] Stage A: Disagreement generalisation
-- [ ] Stage B: Proposal generation
-- [ ] Stage C: Selection
-- [ ] Stage M: Merge synthesis
-- [ ] Create DOCUMENTATION.md for refiner module
+- [x] Create refiner.py with four stages (A/B/C/M)
+- [x] Stage A: Disagreement generalisation
+- [x] Stage B: Proposal generation
+- [x] Stage C: Selection
+- [x] Stage M: Merge synthesis
+- [x] Create DOCUMENTATION.md for refiner module
 
 ## Module 5: History & Logging
 - [x] Create history.py - append-only log management
