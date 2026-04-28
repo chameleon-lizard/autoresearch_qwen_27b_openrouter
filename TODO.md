@@ -34,10 +34,10 @@
 - [x] Create DOCUMENTATION.md for history module
 
 ## Module 6: Main Loop
-- [ ] Create loop.py - main autoresearch loop
-- [ ] Implement batch mode with parallel scoring
-- [ ] Implement crash-safe writes
-- [ ] Create DOCUMENTATION.md for loop module
+- [x] Create loop.py - main autoresearch loop
+- [x] Implement batch mode with parallel scoring
+- [x] Implement crash-safe writes
+- [x] Create DOCUMENTATION.md for loop module
 
 ## Module 7: CLI
 - [ ] Create cli.py - command-line interface
