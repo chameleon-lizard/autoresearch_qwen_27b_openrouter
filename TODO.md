@@ -49,7 +49,7 @@
 - [x] Create DOCUMENTATION.md for notebook module
 
 ## Documentation
-- [ ] Create WIKI.md - executive summary
+- [x] Create WIKI.md - executive summary
 - [ ] Create PROGRESS.md - implementation progress
 - [ ] Create OPS.md - operations runbook
 
