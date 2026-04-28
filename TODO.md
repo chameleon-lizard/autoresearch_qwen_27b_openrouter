@@ -8,8 +8,8 @@
 - [x] Create requirements.txt
 
 ## Module 1: Data Splitting
-- [ ] Create splitter.py - stratified train/dev/test split
-- [ ] Create DOCUMENTATION.md for splitter module
+- [x] Create splitter.py - stratified train/dev/test split
+- [x] Create DOCUMENTATION.md for splitter module
 
 ## Module 2: Scoring
 - [ ] Create scorer.py - wrapper for external scorer (dredd.py)
