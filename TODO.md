@@ -29,9 +29,9 @@
 - [ ] Create DOCUMENTATION.md for refiner module
 
 ## Module 5: History & Logging
-- [ ] Create history.py - append-only log management
+- [x] Create history.py - append-only log management
 - [ ] Create report_generator.py - experiments_report.md generation
-- [ ] Create DOCUMENTATION.md for history module
+- [x] Create DOCUMENTATION.md for history module
 
 ## Module 6: Main Loop
 - [ ] Create loop.py - main autoresearch loop
