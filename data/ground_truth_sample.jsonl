@@ -1,0 +1,20 @@
+{"id": 1, "input": "What is 2 + 2?", "label": "4", "domain": "math"}
+{"id": 2, "input": "What is the capital of France?", "label": "Paris", "domain": "geography"}
+{"id": 3, "input": "What is H2O?", "label": "water", "domain": "science"}
+{"id": 4, "input": "Who wrote Hamlet?", "label": "Shakespeare", "domain": "literature"}
+{"id": 5, "input": "What is 5 * 5?", "label": "25", "domain": "math"}
+{"id": 6, "input": "What is the largest planet?", "label": "Jupiter", "domain": "science"}
+{"id": 7, "input": "Who painted the Mona Lisa?", "label": "Da Vinci", "domain": "art"}
+{"id": 8, "input": "What is 10 - 3?", "label": "7", "domain": "math"}
+{"id": 9, "input": "What is the capital of Japan?", "label": "Tokyo", "domain": "geography"}
+{"id": 10, "input": "What is DNA?", "label": "deoxyribonucleic acid", "domain": "science"}
+{"id": 11, "input": "Who wrote 1984?", "label": "Orwell", "domain": "literature"}
+{"id": 12, "input": "What is 8 / 2?", "label": "4", "domain": "math"}
+{"id": 13, "input": "What is the smallest country?", "label": "Vatican City", "domain": "geography"}
+{"id": 14, "input": "What is photosynthesis?", "label": "plant energy process", "domain": "science"}
+{"id": 15, "input": "Who wrote Pride and Prejudice?", "label": "Austen", "domain": "literature"}
+{"id": 16, "input": "What is 3^2?", "label": "9", "domain": "math"}
+{"id": 17, "input": "What is the capital of Germany?", "label": "Berlin", "domain": "geography"}
+{"id": 18, "input": "What is gravity?", "label": "force of attraction", "domain": "science"}
+{"id": 19, "input": "Who wrote The Great Gatsby?", "label": "Fitzgerald", "domain": "literature"}
+{"id": 20, "input": "What is 15 + 25?", "label": "40", "domain": "math"}
