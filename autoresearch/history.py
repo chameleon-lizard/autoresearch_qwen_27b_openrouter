@@ -15,8 +15,6 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
-from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 from .paths import EXPERIMENTS_LOG, ensure_directories
@@ -37,11 +35,11 @@ class ExperimentEntry:
     metrics_dev: dict[str, float]
     metrics_test: dict[str, float]
     stage_a_summary: str | None = None  # Disagreement generalization
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return asdict(self)
-    
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "ExperimentEntry":
         """Create from dictionary."""
@@ -56,7 +54,7 @@ def append_entry(entry: ExperimentEntry) -> None:
     See DesignDoc.md section 2.3: "Crash- and Ctrl+C-safe"
     """
     ensure_directories()
-    
+
     with open(EXPERIMENTS_LOG, "a") as f:
         f.write(json.dumps(entry.to_dict()) + "\n")
 
@@ -65,7 +63,7 @@ def read_log() -> list[ExperimentEntry]:
     """Read all entries from the experiment log."""
     if not EXPERIMENTS_LOG.exists():
         return []
-    
+
     entries = []
     with open(EXPERIMENTS_LOG, "r") as f:
         for line in f:
@@ -76,7 +74,7 @@ def read_log() -> list[ExperimentEntry]:
                     entries.append(ExperimentEntry.from_dict(data))
                 except json.JSONDecodeError as e:
                     print(f"Warning: Failed to parse log line: {e}")
-    
+
     return entries
 
 
@@ -94,7 +92,7 @@ def get_best_entry_by_dev_kappa() -> ExperimentEntry | None:
     entries = read_log()
     if not entries:
         return None
-    
+
     return max(entries, key=lambda e: e.metrics_dev.get("kappa", 0))
 
 
@@ -135,30 +133,30 @@ def render_history_compact(
     """
     if not entries:
         return "No previous iterations."
-    
+
     lines = []
-    
+
     # Find best so far
     best = max(entries, key=lambda e: e.metrics_dev.get("kappa", 0))
-    
+
     # Get last N entries
     last_n = entries[-full_count:] if len(entries) >= full_count else entries
-    
+
     # Set of entries to render fully
     full_entries = set(e.iter for e in last_n) | {best.iter}
-    
+
     # Render best so far first
     lines.append("=== BEST SO FAR ===")
     lines.append(render_entry_full(best))
     lines.append("")
-    
+
     # Render in iteration order
     for entry in sorted(entries, key=lambda e: e.iter):
         if entry.iter in full_entries:
             lines.append(render_entry_full(entry))
         else:
             lines.append(render_entry_compact(entry))
-    
+
     return "\n".join(lines)
 
 
@@ -167,7 +165,7 @@ def render_entry_full(entry: ExperimentEntry) -> str:
     metrics_str = f"train: κ={entry.metrics_train.get('kappa', 0):.3f} " \
                   f"dev: κ={entry.metrics_dev.get('kappa', 0):.3f} " \
                   f"test: κ={entry.metrics_test.get('kappa', 0):.3f}"
-    
+
     lines = [
         f"--- iter={entry.iter} batch={entry.batch} parent={entry.parent} plan={entry.plan_id} ---",
         f"Rationale: {entry.rationale}",
@@ -177,10 +175,10 @@ def render_entry_full(entry: ExperimentEntry) -> str:
         entry.artifact,
         "</PROMPT>",
     ]
-    
+
     if entry.stage_a_summary:
         lines.append(f"Stage-A summary: {entry.stage_a_summary}")
-    
+
     return "\n".join(lines)
 
 
@@ -206,20 +204,20 @@ def get_plan_statistics(entries: list[ExperimentEntry]) -> dict[str, dict[str, A
     - mean_delta_dev: Mean delta in dev kappa
     """
     plan_stats: dict[str, dict[str, Any]] = {}
-    
+
     # Group by batch
     batches: dict[int, list[ExperimentEntry]] = {}
     for entry in entries:
         if entry.batch not in batches:
             batches[entry.batch] = []
         batches[entry.batch].append(entry)
-    
+
     # Find winner in each batch
     batch_winners: dict[int, str] = {}
     for batch_num, batch_entries in batches.items():
         best = max(batch_entries, key=lambda e: e.metrics_dev.get("kappa", 0))
         batch_winners[batch_num] = best.plan_id
-    
+
     # Compute stats
     for entry in entries:
         plan = entry.plan_id
@@ -229,19 +227,19 @@ def get_plan_statistics(entries: list[ExperimentEntry]) -> dict[str, dict[str, A
                 "won": 0,
                 "deltas": [],
             }
-        
+
         plan_stats[plan]["proposed"] += 1
-        
+
         if batch_winners.get(entry.batch) == plan:
             plan_stats[plan]["won"] += 1
-        
+
         # Compute delta from parent
         if entry.parent is not None:
             parent = get_entry_by_iter(entry.parent)
             if parent:
                 delta = entry.metrics_dev.get("kappa", 0) - parent.metrics_dev.get("kappa", 0)
                 plan_stats[plan]["deltas"].append(delta)
-    
+
     # Compute mean deltas
     for plan, stats in plan_stats.items():
         if stats["deltas"]:
@@ -249,5 +247,5 @@ def get_plan_statistics(entries: list[ExperimentEntry]) -> dict[str, dict[str, A
         else:
             stats["mean_delta_dev"] = 0.0
         del stats["deltas"]  # Remove raw deltas
-    
+
     return plan_stats

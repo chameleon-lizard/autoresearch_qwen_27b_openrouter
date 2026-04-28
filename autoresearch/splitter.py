@@ -15,7 +15,7 @@ from typing import Any
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from .config import SplitConfig, SPLIT
+from .config import SPLIT, SplitConfig
 
 
 def load_ground_truth(filepath: Path) -> pd.DataFrame:
@@ -49,7 +49,7 @@ def stratified_split(
     """
     if config is None:
         config = SPLIT
-    
+
     # First split: separate test set
     train_dev, test = train_test_split(
         df,
@@ -57,18 +57,18 @@ def stratified_split(
         stratify=df[config.stratify_column],
         random_state=config.random_seed,
     )
-    
+
     # Second split: separate dev from train
     # Adjust ratios since we're splitting train_dev, not the full dataset
     dev_ratio_from_train_dev = config.dev_ratio / (config.train_ratio + config.dev_ratio)
-    
+
     train, dev = train_test_split(
         train_dev,
         test_size=dev_ratio_from_train_dev,
         stratify=train_dev[config.stratify_column],
         random_state=config.random_seed,
     )
-    
+
     return train, dev, test
 
 
@@ -80,16 +80,16 @@ def save_splits(
 ) -> tuple[Path, Path, Path]:
     """Save splits to JSONL files."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     train_path = output_dir / "train.jsonl"
     dev_path = output_dir / "dev.jsonl"
     test_path = output_dir / "test.jsonl"
-    
+
     for df, path in [(train, train_path), (dev, dev_path), (test, test_path)]:
         with open(path, "w") as f:
             for _, row in df.iterrows():
                 f.write(json.dumps(row.to_dict()) + "\n")
-    
+
     return train_path, dev_path, test_path
 
 
@@ -101,10 +101,10 @@ def get_split_statistics(
 ) -> dict[str, Any]:
     """Compute and return split statistics for verification."""
     all_data = pd.concat([train, dev, test])
-    
+
     def distribution(df: pd.DataFrame) -> dict[str, float]:
         return df[stratify_column].value_counts(normalize=True).to_dict()
-    
+
     return {
         "total": len(all_data),
         "train": len(train),

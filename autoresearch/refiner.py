@@ -12,13 +12,11 @@ This module implements the LLM prompts and parsing for:
 - Stage M: Merge synthesis
 """
 
-import json
 import re
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
-from .config import RefinerConfig, REFINER
+from .config import REFINER, RefinerConfig
 from .paths import get_batch_path
 
 
@@ -64,27 +62,27 @@ def call_llm(
 ) -> tuple[str, int]:
     """
     Call the refiner LLM with retry logic.
-    
+
     See DesignDoc.md section 7: "Stochasticity for retries"
     Temperature varies across attempts: [0.0, 0.4, 0.7, 0.9]
-    
+
     Returns:
         Tuple of (response_text, attempt_number)
     """
     if config is None:
         config = REFINER
-    
+
     from openai import OpenAI
-    
+
     client = OpenAI(
         api_key=config.api_key,
         base_url=config.base_url,
     )
-    
+
     for attempt, temperature in enumerate(config.retry_temperatures):
         if attempt >= config.max_retries:
             break
-        
+
         try:
             response = client.chat.completions.create(
                 model=config.model,
@@ -95,14 +93,14 @@ def call_llm(
                 temperature=temperature,
                 max_tokens=config.max_tokens,
             )
-            
+
             content = response.choices[0].message.content
-            
+
             # Save attempt for debugging
             if batch_id is not None:
                 batch_path = get_batch_path(batch_id)
                 batch_path.mkdir(parents=True, exist_ok=True)
-                
+
                 attempt_file = batch_path / f"stage_attempt_{attempt + 1}.txt"
                 with open(attempt_file, "w") as f:
                     f.write(f"Temperature: {temperature}\n")
@@ -110,13 +108,13 @@ def call_llm(
                     f.write(f"Has <think>: {'<think>' in content.lower()}\n")
                     f.write("=" * 50 + "\n")
                     f.write(content)
-            
+
             return content, attempt + 1
-            
+
         except Exception as e:
             print(f"LLM attempt {attempt + 1} failed: {e}")
             continue
-    
+
     raise RuntimeError(f"LLM failed after {config.max_retries} attempts")
 
 
@@ -140,12 +138,12 @@ def stage_a(
 ) -> StageAOutput:
     """
     Stage A: Generalise disagreement patterns.
-    
+
     Args:
         errors: List of {input, prediction, label, ...} dicts
         batch_id: For saving debug output
         config: Refiner configuration
-    
+
     Returns:
         StageAOutput with generalised summary
     """
@@ -158,16 +156,16 @@ def stage_a(
             f"  Prediction: {error.get('prediction', 'N/A')}\n"
             f"  Ground Truth: {error.get('label', 'N/A')}\n"
         )
-    
+
     user_prompt = f"""Here are examples where the artifact disagrees with ground truth:
 
 {''.join(examples_text)}
 
 Analyse these errors and produce a concise generalisation of the failure modes.
 Focus on patterns, not individual examples."""
-    
+
     response, _ = call_llm(STAGE_A_SYSTEM, user_prompt, config, batch_id)
-    
+
     return StageAOutput(summary=response.strip())
 
 
@@ -199,7 +197,7 @@ def stage_b(
 ) -> StageBOutput:
     """
     Stage B: Generate K sibling candidates.
-    
+
     Args:
         parent_artifact: The parent artifact text
         stage_a_summary: Generalisation from Stage A
@@ -208,7 +206,7 @@ def stage_b(
         k: Number of candidates to generate
         batch_id: For saving debug output
         config: Refiner configuration
-    
+
     Returns:
         StageBOutput with K candidates
     """
@@ -228,7 +226,7 @@ User constraints (from notebook):
 
 Propose exactly {k} sibling candidates. Each must have:
 1. plan_id
-2. rationale  
+2. rationale
 3. Complete artifact text between <PROMPT>...</PROMPT>
 
 Format each candidate as:
@@ -239,42 +237,42 @@ rationale: <why this should help>
 <complete artifact text>
 </PROMPT>
 """
-    
+
     response, _ = call_llm(STAGE_B_SYSTEM, user_prompt, config, batch_id)
-    
+
     # Parse candidates
     candidates = parse_stage_b_output(response)
-    
+
     return StageBOutput(candidates=candidates)
 
 
 def parse_stage_b_output(text: str) -> list[StageBCandidate]:
     """Parse Stage B output into candidates."""
     candidates = []
-    
+
     # Split by candidate delimiter
     parts = re.split(r'--- CANDIDATE ---', text)
-    
+
     for part in parts[1:]:  # Skip first empty part
         # Extract plan_id
         plan_match = re.search(r'plan_id:\s*(\S+)', part)
         plan_id = plan_match.group(1) if plan_match else "unknown"
-        
+
         # Extract rationale
         ratiole_match = re.search(r'rationale:\s*(.+?)(?:<PROMPT>|$)', part, re.DOTALL)
         rationale = ratiole_match.group(1).strip() if ratiole_match else ""
-        
+
         # Extract artifact
         prompt_match = re.search(r'<PROMPT>\s*\n?(.*?)\n?\s*</PROMPT>', part, re.DOTALL)
         artifact = prompt_match.group(1).strip() if prompt_match else ""
-        
+
         if artifact:
             candidates.append(StageBCandidate(
                 plan_id=plan_id,
                 rationale=rationale,
                 artifact=artifact,
             ))
-    
+
     return candidates
 
 
@@ -304,13 +302,13 @@ def stage_c(
 ) -> StageCOutput:
     """
     Stage C: Select the next parent.
-    
+
     Args:
         history_text: Rendered history with metrics
         best_so_far_iter: Iteration number of best so far
         batch_id: For saving debug output
         config: Refiner configuration
-    
+
     Returns:
         StageCOutput with action and rationale
     """
@@ -324,13 +322,13 @@ Select either:
 - "merge=N1,N2,..." to synthesise a merge from these iterations
 
 Provide your selection and a brief rationale."""
-    
+
     response, _ = call_llm(STAGE_C_SYSTEM, user_prompt, config, batch_id)
-    
+
     # Parse selection
     iter_match = re.search(r'"?iter=(\d+)"?', response)
     merge_match = re.search(r'"?merge=(\d+(?:,\d+)*)"?', response)
-    
+
     if iter_match:
         action = f"iter={iter_match.group(1)}"
     elif merge_match:
@@ -338,11 +336,11 @@ Provide your selection and a brief rationale."""
     else:
         # Default to best so far
         action = f"iter={best_so_far_iter}"
-    
+
     # Extract rationale
     rationale_match = re.search(r'(?:because|rationale|reason)[:\s]+(.+)', response, re.IGNORECASE)
     rationale = rationale_match.group(1).strip() if rationale_match else "Default selection"
-    
+
     return StageCOutput(action=action, rationale=rationale)
 
 
@@ -367,12 +365,12 @@ def stage_m(
 ) -> StageMOutput:
     """
     Stage M: Synthesise a merge from multiple parents.
-    
+
     Args:
         parent_artifacts: List of (iteration_number, artifact_text) tuples
         batch_id: For saving debug output
         config: Refiner configuration
-    
+
     Returns:
         StageMOutput with merged artifact and rationale
     """
@@ -381,10 +379,11 @@ def stage_m(
         parents_text.append(
             f"=== Iteration {iter_num} ===\n{artifact}"
         )
-    
+
+    separator = "\n\n"
     user_prompt = f"""Merge these artifacts into one:
 
-{'\n\n'.join(parents_text)}
+{separator.join(parents_text)}
 
 Produce a single merged artifact that combines their strengths.
 Output format:
@@ -394,14 +393,14 @@ rationale: <which elements from which parents>
 <merged artifact text>
 </PROMPT>
 """
-    
+
     response, _ = call_llm(STAGE_M_SYSTEM, user_prompt, config, batch_id)
-    
+
     # Parse merge
     rationale_match = re.search(r'rationale:\s*(.+?)(?:<PROMPT>|$)', response, re.DOTALL)
     rationale = rationale_match.group(1).strip() if rationale_match else ""
-    
+
     prompt_match = re.search(r'<PROMPT>\s*\n?(.*?)\n?\s*</PROMPT>', response, re.DOTALL)
     artifact = prompt_match.group(1).strip() if prompt_match else ""
-    
+
     return StageMOutput(artifact=artifact, rationale=rationale)

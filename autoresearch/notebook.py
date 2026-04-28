@@ -14,7 +14,6 @@ mid-run without restarting.
 """
 
 from datetime import datetime
-from pathlib import Path
 
 from .paths import NOTEBOOK, ensure_directories
 
@@ -27,7 +26,7 @@ def read_notebook() -> str:
     """
     if not NOTEBOOK.exists():
         return ""
-    
+
     with open(NOTEBOOK, "r") as f:
         return f.read()
 
@@ -37,7 +36,7 @@ def write_notebook(content: str) -> None:
     Write content to the notebook (overwrites).
     """
     ensure_directories()
-    
+
     with open(NOTEBOOK, "w") as f:
         f.write(content)
 
@@ -52,9 +51,9 @@ def append_to_notebook(section: str, content: str, author: str = "agent") -> Non
         author: "user" or "agent"
     """
     ensure_directories()
-    
+
     timestamp = datetime.now().isoformat()
-    
+
     new_section = f"""## {section}
 
 *{author.title()} - {timestamp}*
@@ -64,7 +63,7 @@ def append_to_notebook(section: str, content: str, author: str = "agent") -> Non
 ---
 
 """
-    
+
     with open(NOTEBOOK, "a") as f:
         f.write(new_section)
 
@@ -73,7 +72,7 @@ def create_initial_notebook() -> None:
     """Create an initial notebook with instructions."""
     if NOTEBOOK.exists():
         return
-    
+
     initial_content = f"""# Bidirectional Notebook
 
 *Created: {datetime.now().isoformat()}*
@@ -112,7 +111,7 @@ with `## OBSERVATION` or similar.
 ## Notes
 
 """
-    
+
     write_notebook(initial_content)
 
 
@@ -125,7 +124,7 @@ def parse_user_constraints(content: str) -> list[str]:
     constraints = []
     current_section = None
     current_content = []
-    
+
     for line in content.split("\n"):
         if line.startswith("## USER"):
             if current_section == "USER" and current_content:
@@ -139,11 +138,11 @@ def parse_user_constraints(content: str) -> list[str]:
             current_content = []
         elif current_section == "USER":
             current_content.append(line)
-    
+
     # Don't forget the last section
     if current_section == "USER" and current_content:
         constraints.append("\n".join(current_content).strip())
-    
+
     return constraints
 
 
@@ -155,12 +154,12 @@ def get_notebook_summary(content: str) -> str:
     """
     if not content.strip():
         return "No notebook content."
-    
+
     lines = [
         "=== NOTEBOOK ===",
         "",
     ]
-    
+
     # Extract user constraints
     constraints = parse_user_constraints(content)
     if constraints:
@@ -168,7 +167,7 @@ def get_notebook_summary(content: str) -> str:
         for i, constraint in enumerate(constraints, 1):
             lines.append(f"{i}. {constraint}")
         lines.append("")
-    
+
     # Include full content if not too long
     if len(content) < 2000:
         lines.append("### Full Content")
@@ -176,5 +175,5 @@ def get_notebook_summary(content: str) -> str:
     else:
         lines.append("### Recent Content (last 1000 chars)")
         lines.append(content[-1000:])
-    
+
     return "\n".join(lines)

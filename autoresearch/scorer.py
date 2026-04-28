@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from .paths import get_cache_path, ensure_directories
+from .paths import ensure_directories, get_cache_path
 
 
 def compute_artifact_hash(artifact: str) -> str:
@@ -68,7 +68,7 @@ def load_cached_result(cache_path: Path) -> ScoringResult | None:
     result_file = cache_path / "result.json"
     if not result_file.exists():
         return None
-    
+
     try:
         with open(result_file, "r") as f:
             data = json.load(f)
@@ -81,7 +81,7 @@ def load_cached_result(cache_path: Path) -> ScoringResult | None:
 def save_cached_result(result: ScoringResult, cache_path: Path, artifact: str) -> None:
     """Save a scoring result to cache."""
     cache_path.mkdir(parents=True, exist_ok=True)
-    
+
     # Save the result
     result_file = cache_path / "result.json"
     with open(result_file, "w") as f:
@@ -94,7 +94,7 @@ def save_cached_result(result: ScoringResult, cache_path: Path, artifact: str) -
             "success": result.success,
             "error": result.error,
         }, f, indent=2)
-    
+
     # Save the artifact text for self-describing cache
     artifact_file = cache_path / "artifact.txt"
     with open(artifact_file, "w") as f:
@@ -122,12 +122,12 @@ def score_with_external_scorer(
     """
     if scorer_args is None:
         scorer_args = []
-    
+
     # Write artifact to a temp file
     with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
         f.write(artifact)
         artifact_path = Path(f.name)
-    
+
     try:
         # Build command
         cmd = [
@@ -136,7 +136,7 @@ def score_with_external_scorer(
             "--data", str(data_path),
             *scorer_args,
         ]
-        
+
         # Run scorer
         result = subprocess.run(
             cmd,
@@ -144,10 +144,10 @@ def score_with_external_scorer(
             text=True,
             timeout=300,  # 5 minute timeout per split
         )
-        
+
         if result.returncode != 0:
             return [], f"Scorer failed with code {result.returncode}: {result.stderr}"
-        
+
         # Parse output (expecting JSONL with predictions)
         predictions = []
         for line in result.stdout.strip().split("\n"):
@@ -157,9 +157,9 @@ def score_with_external_scorer(
                     predictions.append(pred.get("prediction", pred.get("label", "")))
                 except json.JSONDecodeError:
                     predictions.append(line)
-        
+
         return predictions, None
-        
+
     except subprocess.TimeoutExpired:
         return [], "Scorer timed out after 300 seconds"
     except FileNotFoundError:
@@ -190,24 +190,24 @@ def score_artifact(
         ScoringResult with metrics and predictions
     """
     ensure_directories()
-    
+
     # Compute hash and check cache
     artifact_hash = compute_artifact_hash(artifact)
     cache_path = get_cache_path(artifact_hash)
-    
+
     # Check if we have a cached result for this split
     cached = load_cached_result(cache_path)
     if cached is not None and cached.split == split_name:
         print(f"[CACHE HIT] {artifact_hash} for {split_name}")
         return cached
-    
+
     print(f"[SCORING] {artifact_hash} on {split_name}")
-    
+
     # Score the artifact
     predictions, error = score_with_external_scorer(
         artifact, data_path, scorer_executable, scorer_args
     )
-    
+
     # Load ground truth labels
     labels = []
     with open(data_path, "r") as f:
@@ -215,7 +215,7 @@ def score_artifact(
             if line.strip():
                 record = json.loads(line)
                 labels.append(record.get("label", record.get("ground_truth", "")))
-    
+
     # Ensure predictions and labels match
     if len(predictions) != len(labels):
         # Pad or truncate predictions to match
@@ -223,10 +223,10 @@ def score_artifact(
             predictions = predictions + [""] * (len(labels) - len(predictions))
         else:
             predictions = predictions[:len(labels)]
-    
+
     # Compute metrics
     from .metrics import compute_all_metrics
-    
+
     if error:
         result = ScoringResult(
             artifact_hash=artifact_hash,
@@ -247,8 +247,8 @@ def score_artifact(
             labels=labels,
             success=True,
         )
-    
+
     # Cache the result
     save_cached_result(result, cache_path, artifact)
-    
+
     return result

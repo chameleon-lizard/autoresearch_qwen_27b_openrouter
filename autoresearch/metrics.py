@@ -12,12 +12,9 @@ Using multiple metrics prevents the selector from finding metric pathologies.
 
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import Any
-
 import numpy as np
 from scipy.stats import spearmanr
-from sklearn.metrics import f1_score, cohen_kappa_score
+from sklearn.metrics import cohen_kappa_score, f1_score
 
 
 def compute_cohen_kappa(predictions: list[str], labels: list[str]) -> float:
@@ -39,10 +36,10 @@ def compute_cohen_kappa(predictions: list[str], labels: list[str]) -> float:
     """
     if len(predictions) != len(labels):
         raise ValueError("Predictions and labels must have the same length")
-    
+
     if len(predictions) == 0:
         return 0.0
-    
+
     try:
         kappa = cohen_kappa_score(labels, predictions)
         return float(kappa)
@@ -67,10 +64,10 @@ def compute_macro_f1(predictions: list[str], labels: list[str]) -> float:
     """
     if len(predictions) != len(labels):
         raise ValueError("Predictions and labels must have the same length")
-    
+
     if len(predictions) == 0:
         return 0.0
-    
+
     try:
         f1 = f1_score(labels, predictions, average="macro", zero_division=0)
         return float(f1)
@@ -100,10 +97,10 @@ def compute_spearman_correlation(
     """
     if len(predictions) != len(labels):
         raise ValueError("Predictions and labels must have the same length")
-    
+
     if len(predictions) == 0:
         return 0.0
-    
+
     # Convert labels to numeric if needed
     if label_order is not None:
         pred_numeric = [label_order.get(p, 0) for p in predictions]
@@ -115,7 +112,7 @@ def compute_spearman_correlation(
         except (ValueError, TypeError):
             # Labels are not numeric and no mapping provided
             return 0.0
-    
+
     try:
         corr, _ = spearmanr(pred_numeric, label_numeric)
         return float(corr) if not np.isnan(corr) else 0.0

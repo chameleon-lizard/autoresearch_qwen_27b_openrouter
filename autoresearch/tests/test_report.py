@@ -1,8 +1,7 @@
 """Tests for the report module."""
 
-from pathlib import Path
 
-from autoresearch.history import ExperimentEntry, append_entry, read_log
+from autoresearch.history import ExperimentEntry, append_entry
 from autoresearch.paths import EXPERIMENTS_LOG, EXPERIMENTS_REPORT
 from autoresearch.report import generate_report, print_report_summary
 
@@ -18,16 +17,16 @@ def setup_clean_log():
 def test_generate_empty_report():
     """Test generating report with no entries."""
     setup_clean_log()
-    
+
     report = generate_report()
-    
+
     assert "No experiments recorded yet" in report
 
 
 def test_generate_report_with_entries():
     """Test generating report with entries."""
     setup_clean_log()
-    
+
     # Add test entries
     entry1 = ExperimentEntry(
         iter=1,
@@ -43,7 +42,7 @@ def test_generate_report_with_entries():
         metrics_test={"kappa": 0.2, "f1": 0.3, "spearman": 0.1},
     )
     append_entry(entry1)
-    
+
     entry2 = ExperimentEntry(
         iter=2,
         batch=1,
@@ -58,9 +57,9 @@ def test_generate_report_with_entries():
         metrics_test={"kappa": 0.25, "f1": 0.35, "spearman": 0.15},
     )
     append_entry(entry2)
-    
+
     report = generate_report()
-    
+
     # Check report contains expected content
     assert "Best So Far" in report
     assert "Iteration 2" in report
@@ -74,7 +73,7 @@ def test_generate_report_with_entries():
 def test_report_file_created():
     """Test that report file is created."""
     setup_clean_log()
-    
+
     entry = ExperimentEntry(
         iter=1,
         batch=1,
@@ -89,16 +88,16 @@ def test_report_file_created():
         metrics_test={"kappa": 0.2},
     )
     append_entry(entry)
-    
+
     generate_report()
-    
+
     assert EXPERIMENTS_REPORT.exists()
 
 
 def test_print_report_summary():
     """Test that print_report_summary doesn't crash."""
     setup_clean_log()
-    
+
     # This should not raise an exception
     try:
         print_report_summary()
