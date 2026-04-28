@@ -10,12 +10,14 @@ This module computes three metrics:
 Using multiple metrics prevents the selector from finding metric pathologies.
 """
 
+from __future__ import annotations
+
 from collections import defaultdict
 from typing import Any
 
 import numpy as np
-from scipy.stats import spearmanr, cohen_kappa_score
-from sklearn.metrics import f1_score
+from scipy.stats import spearmanr
+from sklearn.metrics import f1_score, cohen_kappa_score
 
 
 def compute_cohen_kappa(predictions: list[str], labels: list[str]) -> float:

@@ -43,7 +43,7 @@ def test_spearman_correlation():
     labels = [1, 2, 3, 4, 5]
     
     spearman = compute_spearman_correlation(predictions, labels)
-    assert spearman == 1.0
+    assert abs(spearman - 1.0) < 0.0001
 
 
 def test_spearman_with_label_order():
@@ -77,8 +77,8 @@ def test_compute_metric_delta():
     
     delta = compute_metric_delta(old, new)
     
-    assert delta["delta_kappa"] == 0.05
-    assert delta["delta_f1"] == -0.02
+    assert abs(delta["delta_kappa"] - 0.05) < 0.0001
+    assert abs(delta["delta_f1"] - (-0.02)) < 0.0001
 
 
 def test_metrics_to_string():

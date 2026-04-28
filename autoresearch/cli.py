@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Command-line interface for the autoresearch loop.
 

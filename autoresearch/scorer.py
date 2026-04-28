@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 External scorer wrapper with caching.
 

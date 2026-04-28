@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Four-stage refiner for proposing artifact mutations.
 

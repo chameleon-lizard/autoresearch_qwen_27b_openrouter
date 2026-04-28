@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Centralized path management for the autoresearch loop.
 

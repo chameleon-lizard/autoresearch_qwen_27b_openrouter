@@ -11,6 +11,8 @@ This module provides:
 3. History rendering (compact vs full)
 """
 
+from __future__ import annotations
+
 import json
 from dataclasses import asdict, dataclass
 from datetime import datetime

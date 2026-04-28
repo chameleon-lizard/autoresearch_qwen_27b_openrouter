@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Bidirectional notebook for human-agent communication.
 

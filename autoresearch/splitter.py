@@ -6,6 +6,8 @@ This module provides deterministic, stratified splitting that can be reproduced
 across runs.
 """
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
 from typing import Any
