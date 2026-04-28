@@ -2,9 +2,9 @@
 
 ## Core Infrastructure
 - [x] Initialize git repository
-- [ ] Create project structure (directories)
-- [ ] Create paths.py - centralized path management
-- [ ] Create config.py - configuration management
+- [x] Create project structure (directories)
+- [x] Create paths.py - centralized path management
+- [x] Create config.py - configuration management
 - [ ] Create requirements.txt
 
 ## Module 1: Data Splitting
