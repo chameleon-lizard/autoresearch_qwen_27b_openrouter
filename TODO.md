@@ -17,8 +17,8 @@
 - [ ] Create DOCUMENTATION.md for scorer module
 
 ## Module 3: Metrics
-- [ ] Create metrics.py - compute κ, macro-F1, Spearman
-- [ ] Create DOCUMENTATION.md for metrics module
+- [x] Create metrics.py - compute κ, macro-F1, Spearman
+- [x] Create DOCUMENTATION.md for metrics module
 
 ## Module 4: Refiner Stages
 - [ ] Create refiner.py with four stages (A/B/C/M)
