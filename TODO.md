@@ -54,6 +54,6 @@
 - [x] Create OPS.md - operations runbook
 
 ## Testing
-- [ ] Create tests/ directory
-- [ ] Add unit tests for each module
+- [x] Create tests/ directory
+- [x] Add unit tests for each module
 - [ ] Smoke test with --limit 20
