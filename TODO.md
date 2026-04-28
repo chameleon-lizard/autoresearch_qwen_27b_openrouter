@@ -45,8 +45,8 @@
 - [ ] Create DOCUMENTATION.md for CLI module
 
 ## Module 8: Notebook
-- [ ] Create notebook.py - bidirectional notebook management
-- [ ] Create DOCUMENTATION.md for notebook module
+- [x] Create notebook.py - bidirectional notebook management
+- [x] Create DOCUMENTATION.md for notebook module
 
 ## Documentation
 - [ ] Create WIKI.md - executive summary
