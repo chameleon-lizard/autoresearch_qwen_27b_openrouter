@@ -12,9 +12,9 @@
 - [x] Create DOCUMENTATION.md for splitter module
 
 ## Module 2: Scoring
-- [ ] Create scorer.py - wrapper for external scorer (dredd.py)
-- [ ] Implement caching by content hash
-- [ ] Create DOCUMENTATION.md for scorer module
+- [x] Create scorer.py - wrapper for external scorer (dredd.py)
+- [x] Implement caching by content hash
+- [x] Create DOCUMENTATION.md for scorer module
 
 ## Module 3: Metrics
 - [x] Create metrics.py - compute κ, macro-F1, Spearman
