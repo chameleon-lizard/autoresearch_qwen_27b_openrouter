@@ -5,7 +5,7 @@
 - [x] Create project structure (directories)
 - [x] Create paths.py - centralized path management
 - [x] Create config.py - configuration management
-- [ ] Create requirements.txt
+- [x] Create requirements.txt
 
 ## Module 1: Data Splitting
 - [ ] Create splitter.py - stratified train/dev/test split
