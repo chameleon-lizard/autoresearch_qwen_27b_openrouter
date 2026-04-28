@@ -50,8 +50,8 @@
 
 ## Documentation
 - [x] Create WIKI.md - executive summary
-- [ ] Create PROGRESS.md - implementation progress
-- [ ] Create OPS.md - operations runbook
+- [x] Create PROGRESS.md - implementation progress
+- [x] Create OPS.md - operations runbook
 
 ## Testing
 - [ ] Create tests/ directory
