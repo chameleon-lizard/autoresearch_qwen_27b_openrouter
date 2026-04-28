@@ -40,9 +40,9 @@
 - [x] Create DOCUMENTATION.md for loop module
 
 ## Module 7: CLI
-- [ ] Create cli.py - command-line interface
-- [ ] Commands: run, report, reset, score
-- [ ] Create DOCUMENTATION.md for CLI module
+- [x] Create cli.py - command-line interface
+- [x] Commands: run, report, reset, score
+- [x] Create DOCUMENTATION.md for CLI module
 
 ## Module 8: Notebook
 - [x] Create notebook.py - bidirectional notebook management
