@@ -56,4 +56,4 @@
 ## Testing
 - [x] Create tests/ directory
 - [x] Add unit tests for each module
-- [ ] Smoke test with --limit 20
+- [x] Smoke test with --limit 20 (all 22 tests pass)
