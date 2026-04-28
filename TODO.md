@@ -30,7 +30,7 @@
 
 ## Module 5: History & Logging
 - [x] Create history.py - append-only log management
-- [ ] Create report_generator.py - experiments_report.md generation
+- [x] Create report_generator.py - experiments_report.md generation
 - [x] Create DOCUMENTATION.md for history module
 
 ## Module 6: Main Loop
