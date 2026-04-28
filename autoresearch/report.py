@@ -40,7 +40,7 @@ def generate_report() -> str:
     ]
     
     # Best so far
-    best = get_best_entry_by_dev_kappa(entries)
+    best = get_best_entry_by_dev_kappa()
     if best:
         lines.extend([
             "## Best So Far",
